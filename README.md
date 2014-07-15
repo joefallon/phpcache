@@ -18,7 +18,7 @@ of posts to `all_posts`. Additionally, let's add a tag to this cache entry calle
 `posts_table`.
 
 Then, let's say we cache a single post. Let's give it a key of `post_id_45`. Also,
-let's give it a tag of `posts_table`. So now we have all the posts as a cahce
+let's give it a tag of `posts_table`. So now we have all the posts as a cache
 entry and the post with an ID of 45 as a cache entry. If we delete the post with
 id of 45, then of course remove it from the cache. However, we should also delete
 by tag every cache entry with the tag `posts_table`. This will remove the list of
@@ -31,16 +31,16 @@ TaggedCache Class
 -----------------
 
 The `TaggedCache` class allows the usage of simple key/value cache as a cache
-backend. In fact, any class that implements `ISimpleCache` can be used as a
-cache backend for `TaggedCache`. Currently, only APC is implemented. However,
+back-end. In fact, any class that implements `ISimpleCache` can be used as a
+cache back-end for `TaggedCache`. Currently, only APC is implemented. However,
 it is super easy to add more and I look forward to pull requests.
 
 In addition to tags, `TaggedCache` supports several additional features:
 
-1. The cache can be namespaced to allow more than one cache to be segragated
-   within a backend.
+1. The cache can be namespaced to allow more than one cache to be segregated
+   within a back-end.
 2. A default expires time in seconds is available to allow more aggressive
-   cache expiration than the backend default expires time. This can be useful
+   cache expiration than the back-end default expires time. This can be useful
    for data retrieved from other web services (e.g. feeds).
 3. Each cache entry can have a custom expires time.
 
