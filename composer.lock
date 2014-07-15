@@ -1,0 +1,116 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "fdf283d34a124b44b7d103aa3f91e850",
+    "packages": [
+
+    ],
+    "packages-dev": [
+        {
+            "name": "joefallon/kisstest",
+            "version": "v1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joefallon/kisstest.git",
+                "reference": "345273be2e163bd27fb282d937f1e768822fc4b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joefallon/kisstest/zipball/345273be2e163bd27fb282d937f1e768822fc4b9",
+                "reference": "345273be2e163bd27fb282d937f1e768822fc4b9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "joefallon/phpautoloader": "~1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "JoeFallon": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joe Fallon",
+                    "email": "joseph.t.fallon@gmail.com",
+                    "homepage": "http://blog.joefallon.net",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "KissTest is a gorgeous and fast unit testing framework for PHP that does not require use of the command line.",
+            "homepage": "https://github.com/joefallon/kisstest",
+            "keywords": [
+                "test",
+                "unit-test",
+                "xunit"
+            ],
+            "time": "2014-07-13 00:12:19"
+        },
+        {
+            "name": "joefallon/phpautoloader",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joefallon/phpautoloader.git",
+                "reference": "e14dc8a55ee400d31d4aab1d69f08f31015b0cd8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/joefallon/phpautoloader/zipball/e14dc8a55ee400d31d4aab1d69f08f31015b0cd8",
+                "reference": "e14dc8a55ee400d31d4aab1d69f08f31015b0cd8",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "JoeFallon": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Joe Fallon",
+                    "email": "joseph.t.fallon@gmail.com",
+                    "homepage": "http://blog.joefallon.net",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "Joe's simple to use and versatile PHP autoloader.",
+            "homepage": "https://github.com/joefallon/phpautoloader",
+            "keywords": [
+                "autoloader",
+                "easy-to-use",
+                "kiss",
+                "php",
+                "psr-0"
+            ],
+            "time": "2014-07-10 23:05:16"
+        }
+    ],
+    "aliases": [
+
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": [
+
+    ],
+    "platform": {
+        "php": ">=5.3.0"
+    },
+    "platform-dev": [
+
+    ]
+}
