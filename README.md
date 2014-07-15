@@ -62,6 +62,9 @@ removeAll();
 Here is an example of adding a plain non-tagged value to the tagged cache:
 
 ```php
+use JoeFallon\Cache\ApcCache;
+use JoeFallon\Cache\TaggedCache;
+
 $cache = new TaggedCache(new ApcCache());   // use default namespace and expires
 
 $key1   = 'key1';
@@ -88,6 +91,9 @@ Here is an example of adding a cache entry to the cache that has a tag associate
 with it and then deleting that cache entry by tag instead of by key:
 
 ```php
+use JoeFallon\Cache\ApcCache;
+use JoeFallon\Cache\TaggedCache;
+
 $cache = new TaggedCache(new ApcCache());   // use default namespace and expires
 
 $key1   = 'key1';
