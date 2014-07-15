@@ -1,18 +1,16 @@
 <?php
-/**
- * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- *
- * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- *
- * @license   MIT
- */
-namespace tests\JoeFallon\PhpLibrary\Cache;
+namespace tests\JoeFallon\Cache;
 
 use JoeFallon\KissTest\UnitTest;
-use JoeFallon\PhpLibrary\Cache\ApcCache;
-use JoeFallon\PhpLibrary\Cache\TaggedCache;
+use JoeFallon\Cache\ApcCache;
+use JoeFallon\Cache\TaggedCache;
 
-
+/**
+ * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
+ * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
+ * @license   MIT
+ * @package   tests\JoeFallon\PhpLibrary\Cache
+ */
 class TaggedCacheTests extends UnitTest
 {
     public function test_removeAll_only_removes_namespaced_entries()

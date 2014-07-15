@@ -1,17 +1,15 @@
 <?php
-/**
- * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- *
- * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- *
- * @license   MIT
- */
-namespace tests\JoeFallon\PhpLibrary\Cache;
+namespace tests\JoeFallon\Cache;
 
 use JoeFallon\KissTest\UnitTest;
-use JoeFallon\PhpLibrary\Cache\ApcCache;
+use JoeFallon\Cache\ApcCache;
 
-
+/**
+ * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
+ * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
+ * @license   MIT
+ * @package   tests\JoeFallon\PhpLibrary\Cache
+ */
 class ApcCacheTests extends UnitTest
 {
     public function test_store_and_retrieve()
@@ -26,6 +24,7 @@ class ApcCacheTests extends UnitTest
         $this->assertEqual($val, $cache->retrieve($key));
     }
 
+
     public function test_exists_returns_false_when_key_does_not_exist()
     {
         $key   = 'key1';
@@ -33,6 +32,7 @@ class ApcCacheTests extends UnitTest
         $cache->removeAll();
         $this->assertFalse($cache->exists($key));
     }
+
 
     public function test_exists_returns_true_when_key_exists()
     {
@@ -47,6 +47,7 @@ class ApcCacheTests extends UnitTest
 
         $this->assertTrue($cache->exists($key));
     }
+
 
     public function test_remove()
     {
@@ -63,6 +64,7 @@ class ApcCacheTests extends UnitTest
         $cache->remove($key);
         $this->assertFalse($cache->exists($key));
     }
+
 
     public function test_removeAll()
     {

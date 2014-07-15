@@ -1,13 +1,12 @@
 <?php
+namespace JoeFallon\Cache;
+
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- *
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- *
  * @license   MIT
+ * @package   JoeFallon\Cache
  */
-namespace JoeFallon\PhpLibrary\Cache;
-
 interface ISimpleCache
 {
     /**

@@ -1,13 +1,12 @@
 <?php
+namespace JoeFallon\Cache;
+
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- *
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- *
  * @license   MIT
+ * @package   JoeFallon\Cache
  */
-namespace JoeFallon\PhpLibrary\Cache;
-
 class TaggedCache
 {
     const BASE_METADATA_KEY = 'JoeFallon/Cache/TaggedCache';
@@ -22,22 +21,17 @@ class TaggedCache
     private $_expiresKey;
 
 
-    /************************************************************************
-     *                          Public Methods                              *
-     ************************************************************************/
-
-
     /**
      * @param ISimpleCache $simpleCache
      * @param string|null  $namespace The $namespace allows the cache to
-     *                                be partitioned. See the documentation for
-     *                                removeAll().
+     *                     be partitioned. See the documentation for
+     *                     removeAll().
      * @param int|null     $defaultExpiresInSeconds Any cache entry that
-     *                is stored without a an expiry time set will
-     *                use the default expiry instead. If
-     *                $defaultExpiresInSeconds is null, then
-     *                the time-based cache expiry will be managed
-     *                by $simpleCache.
+     *                     is stored without a an expiry time set will
+     *                     use the default expiry instead. If
+     *                     $defaultExpiresInSeconds is null, then
+     *                     the time-based cache expiry will be managed
+     *                     by $simpleCache.
      */
     public function __construct(ISimpleCache $simpleCache,
                                 $namespace = null,
@@ -126,7 +120,7 @@ class TaggedCache
     /**
      * This function removes the cache entry specified by $key.
      *
-     * @param $key
+     * @param string $key
      */
     public function remove($key)
     {

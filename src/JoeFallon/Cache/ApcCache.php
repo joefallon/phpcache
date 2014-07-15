@@ -1,13 +1,12 @@
 <?php
+namespace JoeFallon\Cache;
+
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- *
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- *
  * @license   MIT
+ * @package   JoeFallon\Cache
  */
-namespace JoeFallon\PhpLibrary\Cache;
-
 class ApcCache implements ISimpleCache
 {
     /**
@@ -60,6 +59,7 @@ class ApcCache implements ISimpleCache
     public function exists($key)
     {
         $key = strval($key);
+
         return apc_exists($key);
     }
 
