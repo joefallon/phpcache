@@ -3,7 +3,7 @@ Joe's PHP Cache
 
 By [Joe Fallon](http://blog.joefallon.net)
 
-Normally, cache entries are invalidated using one of two methods:
+Normally, cache entries are invalidated using one of three methods:
 
 1. The cache entry is explicitly removed via a call to a `remove()` method of
    some sort.
