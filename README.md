@@ -27,6 +27,21 @@ that are dependent on the contents of the posts table not changing. Using one or
 more tags to  clear groups of cache entries make cache management much easier
 and less prone to error.
 
+Installation
+------------
+
+The easiest way to install Joe's PHP Cache is with
+[Composer](https://getcomposer.org/). Create the following `composer.json` file
+and run the `php composer.phar install` command to install it.
+
+```json
+{
+    "require": {
+        "joefallon/phpcache": "*"
+    }
+}
+```
+
 TaggedCache Class
 -----------------
 
