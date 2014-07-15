@@ -44,6 +44,8 @@ In addition to tags, `TaggedCache` supports several additional features:
    for data retrieved from other web services (e.g. feeds).
 3. Each cache entry can have a custom expires time.
 
+### Available Methods
+
 Here is a list of methods available in `TaggedCache`:
 
 ```php
@@ -54,4 +56,47 @@ remove($key)
 removeByTag($tag)
 removeAll();
 ```
+
+### Add and Retrieve a Value From the Cache
+
+Here is an example of adding a plain non-tagged value to the tagged cache:
+
+```php
+$cache = new TaggedCache(new ApcCache());   // use default namespace and expires
+
+$key1   = 'key1';
+$value1 = 'value1';
+
+$cache->store($key1, $value1);
+
+$key1Exists = $cache->exists($key1);
+$value = null;
+
+if($key1Exists)
+{
+    $value = $cache->retrieve($key1);
+}
+else
+{
+    $value = expensiveMethod();
+}
+```
+
+### Add and Remove a Tagged Value From the Cache
+
+Here is an example of adding a cache entry to the cache that has a tag associated
+with it and then deleting that cache entry by tag instead of by key:
+
+```php
+$cache = new TaggedCache(new ApcCache());   // use default namespace and expires
+
+$key1   = 'key1';
+$value1 = 'value1';
+
+$cache->store($key1, $value1, array('tag1', 'tag2'));
+$cache->removeByTag('tag2');  // the cache entry for 'key1' is deleted
+```
+
+NOTE: In the previous example, all entries that have the tag 'tag2' would be
+deleted.
 
