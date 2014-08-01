@@ -9,7 +9,7 @@ namespace JoeFallon\Cache;
  */
 class TaggedCache
 {
-    const BASE_METADATA_KEY = 'JoeFallon/Cache/TaggedCache';
+    const BASE_KEY = 'JoeFallon/Cache/TaggedCache';
 
     /** @var  ISimpleCache */
     private $_simpleCache;
@@ -19,6 +19,16 @@ class TaggedCache
     private $_tagsKey;
     /** @var  string */
     private $_expiresKey;
+
+
+    /*
+     * tagName -> array('key1', 'key2', 'key3');
+     *
+     * key1 -> array( 'expires' => '2013-01-01 10:10:10',
+     *                'tags'    => array('tag1', 'tag2', 'tag3') );
+     *
+     * namespace -> array( all-keys );
+     */
 
 
     /**
@@ -37,16 +47,16 @@ class TaggedCache
                                 $namespace = null,
                                 $defaultExpiresInSeconds = null)
     {
-        $namespace                   = strval($namespace);
-        $defaultExpiresInSeconds     = intval($defaultExpiresInSeconds);
-        $this->_defaultExpiresInSecs = $defaultExpiresInSeconds;
-        $namespaceKey                = self::BASE_METADATA_KEY . ':' . $namespace;
+        $this->_namespaceKey         = self::BASE_KEY . ':' . strval($namespace);
+        $this->_defaultExpiresInSecs = intval($defaultExpiresInSeconds);
         $this->_simpleCache          = $simpleCache;
-        $this->_namespaceKey         = $namespaceKey;
-        $this->_tagsKey              = $namespaceKey . ':tags';
-        $this->_expiresKey           = $namespaceKey . ':expires';
 
-        $this->verifyCacheMetadata();
+
+
+//        $this->_tagsKey              = $namespaceKey . ':tags';
+//        $this->_expiresKey           = $namespaceKey . ':expires';
+
+//        $this->verifyCacheMetadata();
     }
 
 
@@ -65,11 +75,11 @@ class TaggedCache
      */
     public function store($key, $value, array $tags = null, $expiresInSeconds = null)
     {
-        $this->verifyCacheMetadata();
-        $this->removeKeyFromMetadata($key);
-        $this->addTags($key, $tags);
-        $this->setExpires($key, $expiresInSeconds);
-        $this->_simpleCache->store($key, $value);
+//        $this->verifyCacheMetadata();
+//        $this->removeKeyFromMetadata($key);
+//        $this->addTags($key, $tags);
+//        $this->setExpires($key, $expiresInSeconds);
+//        $this->_simpleCache->store($key, $value);
     }
 
 
@@ -103,10 +113,17 @@ class TaggedCache
      */
     public function exists($key)
     {
-        $this->verifyCacheMetadata();
-        $keyExpired = $this->isKeyExpired($key);
+        $exists = $this->_simpleCache->exists($key);
 
-        if(!$this->_simpleCache->exists($key) || $keyExpired == true)
+        if($exists == null)
+        {
+            return false;
+        }
+
+        $cacheEntry = $this->_simpleCache->retrieve($key);
+        $isExpired = $this->isCacheEntryExpired($cacheEntry);
+
+        if($isExpired == true)
         {
             $this->remove($key);
 
@@ -124,9 +141,23 @@ class TaggedCache
      */
     public function remove($key)
     {
-        $this->verifyCacheMetadata();
-        $this->removeKeyFromMetadata($key);
+        $this->removeKeyFromTags($key);
         $this->_simpleCache->remove($key);
+    }
+
+
+    private function removeKeyFromTags($key)
+    {
+        $cacheEntry = $this->_simpleCache->retrieve($key);
+
+        if($cacheEntry == null)
+        {
+            return;
+        }
+
+        $tags = $cacheEntry['tags'];
+
+        if(is_array($tags) == false || count($))
     }
 
 
@@ -138,19 +169,19 @@ class TaggedCache
      */
     public function removeByTag($tag)
     {
-        $this->verifyCacheMetadata();
-        $tagsList = $this->retrieveTagsList();
-
-        if(isset($tagsList[$tag]))
-        {
-            $keyList = $tagsList[$tag];
-            $this->removeTagFromTagsList($tag);
-
-            foreach($keyList as $key)
-            {
-                $this->remove($key);
-            }
-        }
+//        $this->verifyCacheMetadata();
+//        $tagsList = $this->retrieveTagsList();
+//
+//        if(isset($tagsList[$tag]))
+//        {
+//            $keyList = $tagsList[$tag];
+//            $this->removeTagFromTagsList($tag);
+//
+//            foreach($keyList as $key)
+//            {
+//                $this->remove($key);
+//            }
+//        }
     }
 
 
@@ -160,237 +191,240 @@ class TaggedCache
      */
     public function removeAll()
     {
-        $this->verifyCacheMetadata();
-
-        $simpleCache = $this->_simpleCache;
-        $expiresList = $this->retrieveExpiresList();
-
-        foreach($expiresList as $key => $expire)
-        {
-            $simpleCache->remove($key);
-        }
-
-        $this->resetCacheMetadata();
+//        $this->verifyCacheMetadata();
+//
+//        $simpleCache = $this->_simpleCache;
+//        $expiresList = $this->retrieveExpiresList();
+//
+//        foreach($expiresList as $key => $expire)
+//        {
+//            $simpleCache->remove($key);
+//        }
+//
+//        $this->resetCacheMetadata();
     }
 
 
-    private function verifyCacheMetadata()
-    {
-        $this->verifyCachedExpiresList();
-        $this->verifyCachedTagsList();
-    }
-
-
-    private function verifyCachedTagsList()
-    {
-        $simpleCache = $this->_simpleCache;
-        $tagsKey     = $this->_tagsKey;
-
-        if($simpleCache->exists($tagsKey) == false)
-        {
-            $this->resetCacheMetadata();
-        }
-    }
-
-
-    private function verifyCachedExpiresList()
-    {
-        $simpleCache = $this->_simpleCache;
-        $expiresKey  = $this->_expiresKey;
-
-        if($simpleCache->exists($expiresKey) == false)
-        {
-            $this->resetCacheMetadata();
-        }
-    }
-
-
-    private function resetCacheMetadata()
-    {
-        $simpleCache = $this->_simpleCache;
-        $tagsKey     = $this->_tagsKey;
-        $expiresKey  = $this->_expiresKey;
-
-        $simpleCache->store($expiresKey, array());
-        $simpleCache->store($tagsKey, array());
-    }
+//    private function verifyCacheMetadata()
+//    {
+//        $this->verifyCachedExpiresList();
+//        $this->verifyCachedTagsList();
+//    }
+//
+//
+//    private function verifyCachedTagsList()
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $tagsKey     = $this->_tagsKey;
+//
+//        if($simpleCache->exists($tagsKey) == false)
+//        {
+//            $this->resetCacheMetadata();
+//        }
+//    }
+//
+//
+//    private function verifyCachedExpiresList()
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $expiresKey  = $this->_expiresKey;
+//
+//        if($simpleCache->exists($expiresKey) == false)
+//        {
+//            $this->resetCacheMetadata();
+//        }
+//    }
+//
+//
+//    private function resetCacheMetadata()
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $tagsKey     = $this->_tagsKey;
+//        $expiresKey  = $this->_expiresKey;
+//
+//        $simpleCache->store($expiresKey, array());
+//        $simpleCache->store($tagsKey, array());
+//    }
+//
+//
+//    /**
+//     * @param string $key
+//     */
+//    private function removeKeyFromTagList($key)
+//    {
+//        $tagsList = $this->retrieveTagsList();
+//
+//        /*
+//         * $tags = array(
+//         *      'tag-name1' => array('key-name1', 'key-name2', 'key-name3')
+//         *      'tag-name2' => array('key-name4', 'key-name4', 'key-name2')
+//         * );
+//         */
+//        $newTags = array();
+//
+//        foreach($tagsList as $tagName => $keyList)
+//        {
+//            $newTags[$tagName] = array_diff($keyList, array($key));
+//        }
+//
+//        $this->storeTagsList($tagsList);
+//    }
+//
+//
+//    /**
+//     * @param string $key
+//     * @param array  $tags
+//     */
+//    private function addTags($key, array $tags = null)
+//    {
+//        if($tags == null)
+//        {
+//            return;
+//        }
+//
+//        $cachedTagList = $this->retrieveTagsList();
+//
+//        foreach($tags as $tag)
+//        {
+//            if(isset($cachedTagList[$tag]) == true)
+//            {
+//                $keyList             = $cachedTagList[$tag];
+//                $keyList[]           = $key;
+//                $keyList             = array_unique($keyList);
+//                $cachedTagList[$tag] = $keyList;
+//            }
+//            else
+//            {
+//                $cachedTagList[$tag] = array($key);
+//            }
+//        }
+//
+//        $this->storeTagsList($cachedTagList);
+//    }
+//
+//
+//    /**
+//     * @param string   $key
+//     * @param int|null $expiresInSeconds
+//     */
+//    private function setExpires($key, $expiresInSeconds = null)
+//    {
+//        $expiresInSeconds = intval($expiresInSeconds);
+//        $defaultExpires   = $this->_defaultExpiresInSecs;
+//
+//        if($expiresInSeconds == 0)
+//        {
+//            $expiresInSeconds = $defaultExpires;
+//        }
+//
+//        if($expiresInSeconds == 0)
+//        {
+//            $expiresInSeconds = 99999999; // forever (~3.1689 years)
+//        }
+//
+//        $expiresList       = $this->retrieveExpiresList();
+//        $expiresList[$key] = date('Y-m-d H:i:s', time() + $expiresInSeconds);
+//
+//        $this->storeExpiresList($expiresList);
+//    }
+//
+//
+//    /**
+//     * @param string $key
+//     */
+//    private function removeKeyFromExpiresList($key)
+//    {
+//        $expiresList = $this->retrieveExpiresList();
+//
+//        if(isset($expiresList[$key]) == true)
+//        {
+//            unset($expiresList[$key]);
+//            $this->storeExpiresList($expiresList);
+//        }
+//    }
+//
+//
+//    /**
+//     * @param string $key
+//     */
+//    private function removeKeyFromMetadata($key)
+//    {
+//        $this->removeKeyFromTagList($key);
+//        $this->removeKeyFromExpiresList($key);
+//    }
+//
+//
+//    private function retrieveExpiresList()
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $expiresKey  = $this->_expiresKey;
+//        $expiresList = $simpleCache->retrieve($expiresKey);
+//
+//        return $expiresList;
+//    }
+//
+//
+//    /**
+//     * @param array $expiresList
+//     */
+//    private function storeExpiresList(array $expiresList)
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $expiresKey  = $this->_expiresKey;
+//        $simpleCache->store($expiresKey, $expiresList);
+//    }
+//
+//
+//    private function retrieveTagsList()
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $tagsKey     = $this->_tagsKey;
+//        $tagsList    = $simpleCache->retrieve($tagsKey);
+//
+//        return $tagsList;
+//    }
+//
+//
+//    /**
+//     * @param array $tagsList
+//     */
+//    private function storeTagsList(array $tagsList)
+//    {
+//        $simpleCache = $this->_simpleCache;
+//        $tagsKey     = $this->_tagsKey;
+//        $simpleCache->store($tagsKey, $tagsList);
+//    }
+//
+//
+//    /**
+//     * @param string $tag
+//     */
+//    private function removeTagFromTagsList($tag)
+//    {
+//        $tagList = $this->retrieveTagsList();
+//        unset($tagList[$tag]);
+//        $this->storeTagsList($tagList);
+//    }
 
 
     /**
-     * @param string $key
-     */
-    private function removeKeyFromTagList($key)
-    {
-        $tagsList = $this->retrieveTagsList();
-
-        /*
-         * $tags = array(
-         *      'tag-name1' => array('key-name1', 'key-name2', 'key-name3')
-         *      'tag-name2' => array('key-name4', 'key-name4', 'key-name2')
-         * );
-         */
-        $newTags = array();
-
-        foreach($tagsList as $tagName => $keyList)
-        {
-            $newTags[$tagName] = array_diff($keyList, array($key));
-        }
-
-        $this->storeTagsList($tagsList);
-    }
-
-
-    /**
-     * @param string $key
-     * @param array  $tags
-     */
-    private function addTags($key, array $tags = null)
-    {
-        if($tags == null)
-        {
-            return;
-        }
-
-        $cachedTagList = $this->retrieveTagsList();
-
-        foreach($tags as $tag)
-        {
-            if(isset($cachedTagList[$tag]) == true)
-            {
-                $keyList             = $cachedTagList[$tag];
-                $keyList[]           = $key;
-                $keyList             = array_unique($keyList);
-                $cachedTagList[$tag] = $keyList;
-            }
-            else
-            {
-                $cachedTagList[$tag] = array($key);
-            }
-        }
-
-        $this->storeTagsList($cachedTagList);
-    }
-
-
-    /**
-     * @param string   $key
-     * @param int|null $expiresInSeconds
-     */
-    private function setExpires($key, $expiresInSeconds = null)
-    {
-        $expiresInSeconds = intval($expiresInSeconds);
-        $defaultExpires   = $this->_defaultExpiresInSecs;
-
-        if($expiresInSeconds == 0)
-        {
-            $expiresInSeconds = $defaultExpires;
-        }
-
-        if($expiresInSeconds == 0)
-        {
-            $expiresInSeconds = 99999999; // forever (~3.1689 years)
-        }
-
-        $expiresList       = $this->retrieveExpiresList();
-        $expiresList[$key] = date('Y-m-d H:i:s', time() + $expiresInSeconds);
-
-        $this->storeExpiresList($expiresList);
-    }
-
-
-    /**
-     * @param string $key
-     */
-    private function removeKeyFromExpiresList($key)
-    {
-        $expiresList = $this->retrieveExpiresList();
-
-        if(isset($expiresList[$key]) == true)
-        {
-            unset($expiresList[$key]);
-            $this->storeExpiresList($expiresList);
-        }
-    }
-
-
-    /**
-     * @param string $key
-     */
-    private function removeKeyFromMetadata($key)
-    {
-        $this->removeKeyFromTagList($key);
-        $this->removeKeyFromExpiresList($key);
-    }
-
-
-    private function retrieveExpiresList()
-    {
-        $simpleCache = $this->_simpleCache;
-        $expiresKey  = $this->_expiresKey;
-        $expiresList = $simpleCache->retrieve($expiresKey);
-
-        return $expiresList;
-    }
-
-
-    /**
-     * @param array $expiresList
-     */
-    private function storeExpiresList(array $expiresList)
-    {
-        $simpleCache = $this->_simpleCache;
-        $expiresKey  = $this->_expiresKey;
-        $simpleCache->store($expiresKey, $expiresList);
-    }
-
-
-    private function retrieveTagsList()
-    {
-        $simpleCache = $this->_simpleCache;
-        $tagsKey     = $this->_tagsKey;
-        $tagsList    = $simpleCache->retrieve($tagsKey);
-
-        return $tagsList;
-    }
-
-
-    /**
-     * @param array $tagsList
-     */
-    private function storeTagsList(array $tagsList)
-    {
-        $simpleCache = $this->_simpleCache;
-        $tagsKey     = $this->_tagsKey;
-        $simpleCache->store($tagsKey, $tagsList);
-    }
-
-
-    /**
-     * @param string $tag
-     */
-    private function removeTagFromTagsList($tag)
-    {
-        $tagList = $this->retrieveTagsList();
-        unset($tagList[$tag]);
-        $this->storeTagsList($tagList);
-    }
-
-
-    /**
-     * @param string $key
+     * @param array $cacheEntry
      *
      * @return bool
      */
-    private function isKeyExpired($key)
+    private function isCacheEntryExpired($cacheEntry)
     {
-        $expiresList = $this->retrieveExpiresList();
-
-        if(isset($expiresList[$key]) == false)
+        if($cacheEntry == null)
         {
             return true;
         }
 
-        $expires = $expiresList[$key];
+        $expires = $cacheEntry['expires'];
+
+        if(empty($expires) == true)
+        {
+            return false;
+        }
 
         if($expires <= date('Y-m-d H:i:s'))
         {
