@@ -28,7 +28,6 @@ class TaggedCache
      * namespace -> array( all-keys );
      */
 
-
     /**
      * @param ISimpleCache $simpleCache
      * @param string|null  $namespace               The $namespace allows the cache to
@@ -49,7 +48,6 @@ class TaggedCache
         $this->_defaultExpiresInSecs = intval($defaultExpiresInSeconds);
         $this->_simpleCache          = $simpleCache;
     }
-
 
     /**
      * Store the given $value in the cache and assign it the key $key. Cache
@@ -101,7 +99,10 @@ class TaggedCache
         $this->addKeyToTag($key, self::ALL_KEYS_TAG);
     }
 
-
+    /**
+     * @param string $key
+     * @param string $tag
+     */
     private function addKeyToTag($key, $tag)
     {
         $keyList = $this->namespaceTagRetrieve($tag);
@@ -115,7 +116,6 @@ class TaggedCache
         $keyList   = array_unique($keyList);
         $this->namespaceTagStore($tag, $keyList);
     }
-
 
     /**
      * This function retrieves the cache entry specified by $key from
@@ -149,7 +149,6 @@ class TaggedCache
         return $cacheValue;
     }
 
-
     /**
      * This function returns true if the cache entry specified by
      * $key exists; otherwise, it returns false.
@@ -179,7 +178,6 @@ class TaggedCache
         return true;
     }
 
-
     /**
      * This function removes the cache entry specified by $key.
      *
@@ -191,7 +189,6 @@ class TaggedCache
         $this->removeKeyFromSingleCacheTagEntry(self::ALL_KEYS_TAG, $key);
         $this->namespaceKeyRemove($key);
     }
-
 
     /**
      * This function removes all cache entries that have been tagged
@@ -216,7 +213,6 @@ class TaggedCache
         $this->namespaceTagRemove($tag);
     }
 
-
     /**
      * This function removes all values from the cache in the current
      * namespace.
@@ -238,7 +234,6 @@ class TaggedCache
         $this->namespaceTagRemove(self::ALL_KEYS_TAG);
     }
 
-
     /**
      * @param string $key
      * @param mixed  $value
@@ -250,7 +245,6 @@ class TaggedCache
         $simpleCache->store($namespacedKey, $value);
     }
 
-
     /**
      * @param string $key
      */
@@ -260,7 +254,6 @@ class TaggedCache
         $simpleCache   = $this->_simpleCache;
         $simpleCache->remove($namespacedKey);
     }
-
 
     /**
      * @param string $key
@@ -276,7 +269,6 @@ class TaggedCache
         return $cacheEntry;
     }
 
-
     /**
      * @param string $tag
      * @param array  $keys
@@ -288,7 +280,6 @@ class TaggedCache
         $simpleCache->store($namespacedTag, $keys);
     }
 
-
     /**
      * @param string $tag
      */
@@ -298,7 +289,6 @@ class TaggedCache
         $simpleCache   = $this->_simpleCache;
         $simpleCache->remove($namespacedTag);
     }
-
 
     /**
      * @param string $tag
@@ -313,7 +303,6 @@ class TaggedCache
 
         return $cacheEntry;
     }
-
 
     /**
      * @param array $cacheEntry
@@ -342,7 +331,6 @@ class TaggedCache
         return false;
     }
 
-
     /**
      * @param string $key
      *
@@ -352,7 +340,6 @@ class TaggedCache
     {
         return $this->_namespace . 'key:' . strval($key);
     }
-
 
     /**
      * @param string $tag
@@ -364,7 +351,9 @@ class TaggedCache
         return $this->_namespace . 'tag:' . strval($tag);
     }
 
-
+    /**
+     * @param string $key
+     */
     private function removeKeyFromTagCacheEntries($key)
     {
         $cacheEntry = $this->namespaceKeyRetrieve($key);
@@ -387,7 +376,10 @@ class TaggedCache
         }
     }
 
-
+    /**
+     * @param string $tag
+     * @param string $key
+     */
     private function removeKeyFromSingleCacheTagEntry($tag, $key)
     {
         $keyList = $this->namespaceTagRetrieve($tag);

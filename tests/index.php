@@ -7,4 +7,4 @@ new \tests\JoeFallon\Cache\TaggedCacheTests();
 
 UnitTest::getAllUnitTestsSummary();
 
-echo "<pre>" . print_r(apc_cache_info('user'), true);
+//echo "<pre>" . print_r(apc_cache_info('user'), true);
