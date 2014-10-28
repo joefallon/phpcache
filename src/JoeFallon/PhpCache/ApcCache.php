@@ -1,13 +1,12 @@
 <?php
-namespace JoeFallon\Cache;
+namespace JoeFallon\PhpCache;
 
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
  * @license   MIT
- * @package   JoeFallon\Cache
  */
-class ApcCache implements ISimpleCache
+class ApcCache implements Cacheable
 {
     /**
      * Store the given $value in the cache and assign it

@@ -4,30 +4,28 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "756f25d2f8efddb28ecc66196655cd5b",
-    "packages": [
-
-    ],
+    "hash": "2b8a2d8f4287fcca8151aacf791a39f8",
+    "packages": [],
     "packages-dev": [
         {
             "name": "joefallon/kisstest",
-            "version": "v1.0.3",
+            "version": "v1.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joefallon/kisstest.git",
-                "reference": "345273be2e163bd27fb282d937f1e768822fc4b9"
+                "reference": "14c99dfe9fe10e44406cba000f4c7b6066d13014"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joefallon/kisstest/zipball/345273be2e163bd27fb282d937f1e768822fc4b9",
-                "reference": "345273be2e163bd27fb282d937f1e768822fc4b9",
+                "url": "https://api.github.com/repos/joefallon/kisstest/zipball/14c99dfe9fe10e44406cba000f4c7b6066d13014",
+                "reference": "14c99dfe9fe10e44406cba000f4c7b6066d13014",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
             "require-dev": {
-                "joefallon/phpautoloader": "~1.0"
+                "joefallon/phpautoloader": "~2.0"
             },
             "type": "library",
             "autoload": {
@@ -43,8 +41,7 @@
                 {
                     "name": "Joe Fallon",
                     "email": "joseph.t.fallon@gmail.com",
-                    "homepage": "http://blog.joefallon.net",
-                    "role": "Lead Developer"
+                    "homepage": "http://blog.joefallon.net"
                 }
             ],
             "description": "KissTest is a gorgeous and fast unit testing framework for PHP that does not require use of the command line.",
@@ -54,20 +51,20 @@
                 "unit-test",
                 "xunit"
             ],
-            "time": "2014-07-13 00:12:19"
+            "time": "2014-10-22 20:47:37"
         },
         {
             "name": "joefallon/phpautoloader",
-            "version": "v1.0.1",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/joefallon/phpautoloader.git",
-                "reference": "e14dc8a55ee400d31d4aab1d69f08f31015b0cd8"
+                "reference": "bae8db9f3327d44f8231f6ac414d00f9511f1dc4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/joefallon/phpautoloader/zipball/e14dc8a55ee400d31d4aab1d69f08f31015b0cd8",
-                "reference": "e14dc8a55ee400d31d4aab1d69f08f31015b0cd8",
+                "url": "https://api.github.com/repos/joefallon/phpautoloader/zipball/bae8db9f3327d44f8231f6ac414d00f9511f1dc4",
+                "reference": "bae8db9f3327d44f8231f6ac414d00f9511f1dc4",
                 "shasum": ""
             },
             "type": "library",
@@ -84,33 +81,27 @@
                 {
                     "name": "Joe Fallon",
                     "email": "joseph.t.fallon@gmail.com",
-                    "homepage": "http://blog.joefallon.net",
+                    "homepage": "http://blog.joefallon.net/",
                     "role": "Lead Developer"
                 }
             ],
             "description": "Joe's simple to use and versatile PHP autoloader.",
             "homepage": "https://github.com/joefallon/phpautoloader",
             "keywords": [
+                "Simple",
                 "autoloader",
-                "easy-to-use",
-                "kiss",
-                "php",
+                "namespace",
                 "psr-0"
             ],
-            "time": "2014-07-10 23:05:16"
+            "time": "2014-10-20 14:58:35"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ],
+    "stability-flags": [],
+    "prefer-stable": false,
     "platform": {
         "php": ">=5.3.0"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }

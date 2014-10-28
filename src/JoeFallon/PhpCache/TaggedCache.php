@@ -1,20 +1,19 @@
 <?php
-namespace JoeFallon\Cache;
+namespace JoeFallon\PhpCache;
 
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
  * @license   MIT
- * @package   JoeFallon\Cache
  */
 class TaggedCache
 {
     const BASE_NAMESPACE = 'JoeFallon/Cache/TaggedCache';
-    const MAX_EXPIRES    = 31557600; // forever = 1yr = 365.25 days
-    const ALL_KEYS_TAG = 'tagged_cache_all_keys';
+    const MAX_EXPIRES    = 31557600; // 1 year
+    const ALL_KEYS_TAG   = 'tagged_cache_all_keys';
 
-    /** @var  ISimpleCache */
-    private $_simpleCache;
+    /** @var  Cacheable */
+    private $_cache;
     /** @var  string */
     private $_namespace;
 
@@ -29,24 +28,22 @@ class TaggedCache
      */
 
     /**
-     * @param ISimpleCache $simpleCache
-     * @param string|null  $namespace               The $namespace allows the cache to
-     *                                              be partitioned. See the documentation for
-     *                                              removeAll().
-     * @param int|null     $defaultExpiresInSeconds Any cache entry that
-     *                                              is stored without a an expiry time set will
-     *                                              use the default expiry instead. If
-     *                                              $defaultExpiresInSeconds is null, then
-     *                                              the time-based cache expiry will be managed
-     *                                              by $simpleCache.
+     * @param Cacheable   $cache
+     * @param string|null $namespace  The $namespace allows the cache to
+     *  be partitioned. See the documentation for removeAll().
+     * @param int|null    $defaultExpiresInSeconds  Any cache entry that
+     *  is stored without a an expiry time set will use the default expiry instead. If
+     *  $defaultExpiresInSeconds is null, then the time-based cache expiry will be
+     *  managed by $simpleCache.
+     *
+     * @internal param Cacheable $simpleCache
      */
-    public function __construct(ISimpleCache $simpleCache,
-                                $namespace = null,
+    public function __construct(Cacheable $cache, $namespace = null,
                                 $defaultExpiresInSeconds = null)
     {
-        $this->_namespace            = self::BASE_NAMESPACE . ':' . strval($namespace) . ':';
+        $this->_namespace = self::BASE_NAMESPACE . ':' . strval($namespace) . ':';
         $this->_defaultExpiresInSecs = intval($defaultExpiresInSeconds);
-        $this->_simpleCache          = $simpleCache;
+        $this->_cache = $cache;
     }
 
     /**
@@ -241,7 +238,7 @@ class TaggedCache
     private function namespaceKeyStore($key, $value)
     {
         $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $simpleCache->store($namespacedKey, $value);
     }
 
@@ -251,7 +248,7 @@ class TaggedCache
     private function namespaceKeyRemove($key)
     {
         $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $simpleCache->remove($namespacedKey);
     }
 
@@ -263,7 +260,7 @@ class TaggedCache
     private function namespaceKeyRetrieve($key)
     {
         $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $cacheEntry    = $simpleCache->retrieve($namespacedKey);
 
         return $cacheEntry;
@@ -276,7 +273,7 @@ class TaggedCache
     private function namespaceTagStore($tag, $keys)
     {
         $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $simpleCache->store($namespacedTag, $keys);
     }
 
@@ -286,7 +283,7 @@ class TaggedCache
     private function namespaceTagRemove($tag)
     {
         $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $simpleCache->remove($namespacedTag);
     }
 
@@ -298,7 +295,7 @@ class TaggedCache
     private function namespaceTagRetrieve($tag)
     {
         $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_simpleCache;
+        $simpleCache   = $this->_cache;
         $cacheEntry    = $simpleCache->retrieve($namespacedTag);
 
         return $cacheEntry;

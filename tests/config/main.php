@@ -1,5 +1,5 @@
 <?php
-use JoeFallon\Autoloader;
+use JoeFallon\AutoLoader;
 
 // Define the include paths.
 define('BASE_PATH', realpath(dirname(__FILE__).'/../../'));
@@ -11,4 +11,4 @@ set_include_path(get_include_path().':'.SRC_PATH.':'.BASE_PATH);
 
 require(VEND_PATH.'/autoload.php');
 
-Autoloader::registerAutoLoad();
+AutoLoader::registerAutoLoad();

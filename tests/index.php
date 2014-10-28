@@ -2,8 +2,8 @@
 use JoeFallon\KissTest\UnitTest;
 require('config/main.php');
 
-new \tests\JoeFallon\Cache\ApcCacheTests();
-new \tests\JoeFallon\Cache\TaggedCacheTests();
+new \tests\JoeFallon\PhpCache\ApcCacheTests();
+new \tests\JoeFallon\PhpCache\TaggedCacheTests();
 
 UnitTest::getAllUnitTestsSummary();
 

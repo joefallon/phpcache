@@ -1,14 +1,13 @@
 <?php
-namespace tests\JoeFallon\Cache;
+namespace tests\JoeFallon\PhpCache;
 
 use JoeFallon\KissTest\UnitTest;
-use JoeFallon\Cache\ApcCache;
+use JoeFallon\PhpCache\ApcCache;
 
 /**
  * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
  * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
  * @license   MIT
- * @package   tests\JoeFallon\PhpLibrary\Cache
  */
 class ApcCacheTests extends UnitTest
 {
