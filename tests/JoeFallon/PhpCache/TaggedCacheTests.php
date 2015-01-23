@@ -12,6 +12,26 @@ use JoeFallon\PhpCache\TaggedCache;
  */
 class TaggedCacheTests extends UnitTest
 {
+    public function test_removeAll_for_no_cache_entries()
+    {
+        $cache = new TaggedCache(new ApcCache(), 'namespace');
+        $cache->removeAll();
+    }
+
+    public function test_removeByTag_for_missing_tag()
+    {
+        $cache = new TaggedCache(new ApcCache(), 'namespace');
+        $cache->removeByTag('non-existent_tag');
+    }
+
+    public function test_retrieve_returns_null_on_missing_cache_entry()
+    {
+        $cache = new TaggedCache(new ApcCache(), 'namespace');
+        $value = $cache->retrieve('non-existent-key');
+
+        $this->assertEqual($value, null);
+    }
+
     public function test_removeAll_only_removes_namespaced_entries()
     {
         $cache1 = new TaggedCache(new ApcCache(), 'namespace1');

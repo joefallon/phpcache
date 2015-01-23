@@ -17,7 +17,8 @@
     },
     "require-dev": {
         "joefallon/phpautoloader": "~2.0",
-        "joefallon/kisstest":      "~1.0"
+        "joefallon/kisstest":      "~1.0",
+        "phpunit/php-code-coverage": "~2.0"
     },
     "minimum-stability": "dev",
     "autoload": {

@@ -36,7 +36,6 @@ class TaggedCache
      *  $defaultExpiresInSeconds is null, then the time-based cache expiry will be
      *  managed by $simpleCache.
      *
-     * @internal param Cacheable $simpleCache
      */
     public function __construct(Cacheable $cache, $namespace = null,
                                 $defaultExpiresInSeconds = null)
