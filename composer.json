@@ -1,7 +1,7 @@
 {
     "name": "joefallon/phpcache",
     "type": "library",
-    "description": "This package contains a tag-based cache. Currently, only APC is supported.",
+    "description": "This package contains a tag-based cache (APC only).",
     "keywords": [ "PHP", "cache", "tags", "APC", "russian doll" ],
     "homepage": "https://github.com/joefallon/phpcache",
     "license": "MIT",
@@ -17,8 +17,7 @@
     },
     "require-dev": {
         "joefallon/phpautoloader": "~2.0",
-        "joefallon/kisstest":      "~1.0",
-        "phpunit/php-code-coverage": "~2.0"
+        "joefallon/kisstest":      "~1.0"
     },
     "minimum-stability": "dev",
     "autoload": {

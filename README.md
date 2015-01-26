@@ -64,11 +64,11 @@ In addition to tags, `TaggedCache` supports several additional features:
 Here is a list of methods available in `TaggedCache`:
 
 ```php
-store($key, $value, array $tags = null, $expiresInSeconds = null)
-retrieve($key)
-exists($key)
-remove($key)
-removeByTag($tag)
+store($key, $value, array $tags = null, $expiresInSeconds = null);
+retrieve($key);
+exists($key);
+remove($key);
+removeByTag($tag);
 removeAll();
 ```
 
