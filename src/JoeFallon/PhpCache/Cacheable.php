@@ -1,19 +1,12 @@
 <?php
 namespace JoeFallon\PhpCache;
 
-/**
- * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- * @license   MIT
- */
 interface Cacheable
 {
     /**
-     * Store the given $value in the cache and assign it
-     * the key $key. Cache keys are unique. Storing
-     * a value using a cache key that already exists will
-     * overwrite the existing value that is stored at the
-     * cache key.
+     * Store the given $value in the cache and assign it the key $key. Cache keys are unique.
+     * Storing a value using a cache key that already exists will overwrite the existing value
+     * that is stored at the cache key.
      *
      * @param string $key
      * @param mixed  $value
@@ -22,8 +15,7 @@ interface Cacheable
 
 
     /**
-     * Retrieve the value specified by the $key from
-     * the cache if it exists, null otherwise.
+     * Retrieve the value specified by the $key from the cache if it exists, null otherwise.
      *
      * @param string $key
      *

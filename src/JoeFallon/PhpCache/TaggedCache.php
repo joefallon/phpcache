@@ -1,74 +1,51 @@
 <?php
 namespace JoeFallon\PhpCache;
 
-/**
- * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- * @license   MIT
- */
 class TaggedCache
 {
     const BASE_NAMESPACE = 'JoeFallon/Cache/TaggedCache';
-    const MAX_EXPIRES    = 31557600; // 1 year
+    const MAX_EXPIRES    = 31557600;  // i.e. 1 year
     const ALL_KEYS_TAG   = 'tagged_cache_all_keys';
 
-    /** @var  Cacheable */
+    /** @var Cacheable */
     private $_cache;
-    /** @var  string */
+    /** @var string */
     private $_namespace;
 
-
-    /*
-     * tagName -> array('key1', 'key2', 'key3');
-     *
-     * key1 -> array( 'expires' => '2013-01-01 10:10:10',
-     *                'tags'    => array('tag1', 'tag2', 'tag3') );
-     *
-     * namespace -> array( all-keys );
-     */
-
     /**
-     * @param Cacheable   $cache
-     * @param string|null $namespace  The $namespace allows the cache to
-     *  be partitioned. See the documentation for removeAll().
-     * @param int|null    $defaultExpiresInSeconds  Any cache entry that
-     *  is stored without a an expiry time set will use the default expiry instead. If
-     *  $defaultExpiresInSeconds is null, then the time-based cache expiry will be
-     *  managed by $simpleCache.
-     *
+     * @param Cacheable $cache     Backing cache.
+     * @param string    $namespace Allows namespace partitioning.
+     * @param int       $defaultExpiresInSeconds
      */
-    public function __construct(Cacheable $cache, $namespace = null,
-                                $defaultExpiresInSeconds = null)
+    public function __construct(Cacheable $cache, $namespace = "",
+                                $defaultExpiresInSeconds = self::MAX_EXPIRES)
     {
-        $this->_namespace = self::BASE_NAMESPACE . ':' . strval($namespace) . ':';
+        $this->_namespace            = self::BASE_NAMESPACE . ':' . strval($namespace) . ':';
         $this->_defaultExpiresInSecs = intval($defaultExpiresInSeconds);
-        $this->_cache = $cache;
+        $this->_cache                = $cache;
     }
 
     /**
-     * Store the given $value in the cache and assign it the key $key. Cache
-     * keys are unique. Storing a value using a cache key that already exists
-     * will overwrite the existing value that is stored at the cache key. The
-     * cache entry will expire in $expiresInSeconds if it is not null. If
-     * $expiresInSeconds is null, the $defaultExpiresInSeconds is used to
-     * expire the cache entry.
+     * Store the given $value in the cache and assign it the key $key. Cache keys are unique.
+     * Storing a value using a cache key that already exists will overwrite the existing value that
+     * is stored at the cache key. The cache entry will expire in $expiresInSeconds if it is not
+     * null. If $expiresInSeconds is null, the $defaultExpiresInSeconds is used to expire the cache
+     * entry.
      *
      * @param string $key
      * @param mixed  $value
      * @param array  $tags
-     * @param string $expiresInSeconds
+     * @param int    $expiresInSeconds
      */
-    public function store($key, $value, array $tags = null, $expiresInSeconds = null)
+    public function store($key, $value, array $tags = null, $expiresInSeconds = 0)
     {
         $this->remove($key);
-        $cacheEntry = array();
-
+        $cacheEntry       = array();
         $expiresInSeconds = intval($expiresInSeconds);
-        $defaultExpires   = $this->_defaultExpiresInSecs;
 
         if($expiresInSeconds == 0)
         {
-            $expiresInSeconds = $defaultExpires;
+            $expiresInSeconds = $this->_defaultExpiresInSecs;
         }
 
         if($expiresInSeconds == 0)
@@ -96,6 +73,131 @@ class TaggedCache
     }
 
     /**
+     * This function removes the cache entry specified by $key.
+     *
+     * @param string $key
+     */
+    public function remove($key)
+    {
+        $this->removeKeyFromTagCacheEntries($key);
+        $this->removeKeyFromSingleCacheTagEntry(self::ALL_KEYS_TAG, $key);
+        $this->namespaceKeyRemove($key);
+    }
+
+    /**
+     * @param string $key
+     */
+    private function removeKeyFromTagCacheEntries($key)
+    {
+        $cacheEntry = $this->namespaceKeyRetrieve($key);
+
+        if($cacheEntry == null || isset($cacheEntry['tags']) == false)
+        {
+            return;
+        }
+
+        $tags = $cacheEntry['tags'];
+
+        if(is_array($tags) == false || count($tags) == 0)
+        {
+            return;
+        }
+
+        foreach($tags as $tag)
+        {
+            $this->removeKeyFromSingleCacheTagEntry($tag, $key);
+        }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
+    private function namespaceKeyRetrieve($key)
+    {
+        $namespacedKey = $this->namespaceKey($key);
+        $simpleCache   = $this->_cache;
+        $cacheEntry    = $simpleCache->retrieve($namespacedKey);
+
+        return $cacheEntry;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    private function namespaceKey($key)
+    {
+        return $this->_namespace . 'key:' . strval($key);
+    }
+
+    /**
+     * @param string $tag
+     * @param string $key
+     */
+    private function removeKeyFromSingleCacheTagEntry($tag, $key)
+    {
+        $keyList = $this->namespaceTagRetrieve($tag);
+
+        if($keyList == null || is_array($keyList) == false || count($keyList) == 0)
+        {
+            return;
+        }
+
+        $keyList = array_diff($keyList, array($key));
+        $this->namespaceKeyStore($tag, $keyList);
+    }
+
+    /**
+     * @param string $tag
+     *
+     * @return array
+     */
+    private function namespaceTagRetrieve($tag)
+    {
+        $namespacedTag = $this->namespaceTag($tag);
+        $simpleCache   = $this->_cache;
+        $cacheEntry    = $simpleCache->retrieve($namespacedTag);
+
+        return $cacheEntry;
+    }
+
+    /**
+     * @param string $tag
+     *
+     * @return string
+     */
+    private function namespaceTag($tag)
+    {
+        return $this->_namespace . 'tag:' . strval($tag);
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    private function namespaceKeyStore($key, $value)
+    {
+        $namespacedKey = $this->namespaceKey($key);
+        $simpleCache   = $this->_cache;
+        $simpleCache->store($namespacedKey, $value);
+    }
+
+    /**
+     * @param string $key
+     */
+    private function namespaceKeyRemove($key)
+    {
+        $namespacedKey = $this->namespaceKey($key);
+        $simpleCache   = $this->_cache;
+        $simpleCache->remove($namespacedKey);
+    }
+
+    /**
+     * This function adds a $key to the collection of keys for a given $tag.
+     *
      * @param string $key
      * @param string $tag
      */
@@ -114,9 +216,19 @@ class TaggedCache
     }
 
     /**
-     * This function retrieves the cache entry specified by $key from
-     * the cache if it exists and has not expired; otherwise, null is
-     * returned.
+     * @param string $tag
+     * @param array  $keys
+     */
+    private function namespaceTagStore($tag, $keys)
+    {
+        $namespacedTag = $this->namespaceTag($tag);
+        $simpleCache   = $this->_cache;
+        $simpleCache->store($namespacedTag, $keys);
+    }
+
+    /**
+     * This function retrieves the cache entry specified by $key from the cache if it exists and
+     * has not expired; otherwise, null is returned.
      *
      * @param string $key
      *
@@ -143,161 +255,6 @@ class TaggedCache
         $cacheValue = $cacheEntry['value'];
 
         return $cacheValue;
-    }
-
-    /**
-     * This function returns true if the cache entry specified by
-     * $key exists; otherwise, it returns false.
-     *
-     * @param string $key
-     *
-     * @return boolean
-     */
-    public function exists($key)
-    {
-        $cacheEntry = $this->namespaceKeyRetrieve($key);
-
-        if($cacheEntry == null)
-        {
-            return false;
-        }
-
-        $expired = $this->isCacheEntryExpired($cacheEntry);
-
-        if($expired == true)
-        {
-            $this->remove($key);
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * This function removes the cache entry specified by $key.
-     *
-     * @param string $key
-     */
-    public function remove($key)
-    {
-        $this->removeKeyFromTagCacheEntries($key);
-        $this->removeKeyFromSingleCacheTagEntry(self::ALL_KEYS_TAG, $key);
-        $this->namespaceKeyRemove($key);
-    }
-
-    /**
-     * This function removes all cache entries that have been tagged
-     * with $tag.
-     *
-     * @param string $tag
-     */
-    public function removeByTag($tag)
-    {
-        $keyList = $this->namespaceTagRetrieve($tag);
-
-        if($keyList == null || is_array($keyList) == false || count($keyList) == 0)
-        {
-            return;
-        }
-
-        foreach($keyList as $key)
-        {
-            $this->remove($key);
-        }
-
-        $this->namespaceTagRemove($tag);
-    }
-
-    /**
-     * This function removes all values from the cache in the current
-     * namespace.
-     */
-    public function removeAll()
-    {
-        $keyList = $this->namespaceTagRetrieve(self::ALL_KEYS_TAG);
-
-        if($keyList == null || is_array($keyList) == false || count($keyList) == 0)
-        {
-            return;
-        }
-
-        foreach($keyList as $key)
-        {
-            $this->remove($key);
-        }
-
-        $this->namespaceTagRemove(self::ALL_KEYS_TAG);
-    }
-
-    /**
-     * @param string $key
-     * @param mixed  $value
-     */
-    private function namespaceKeyStore($key, $value)
-    {
-        $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_cache;
-        $simpleCache->store($namespacedKey, $value);
-    }
-
-    /**
-     * @param string $key
-     */
-    private function namespaceKeyRemove($key)
-    {
-        $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_cache;
-        $simpleCache->remove($namespacedKey);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     */
-    private function namespaceKeyRetrieve($key)
-    {
-        $namespacedKey = $this->namespaceKey($key);
-        $simpleCache   = $this->_cache;
-        $cacheEntry    = $simpleCache->retrieve($namespacedKey);
-
-        return $cacheEntry;
-    }
-
-    /**
-     * @param string $tag
-     * @param array  $keys
-     */
-    private function namespaceTagStore($tag, $keys)
-    {
-        $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_cache;
-        $simpleCache->store($namespacedTag, $keys);
-    }
-
-    /**
-     * @param string $tag
-     */
-    private function namespaceTagRemove($tag)
-    {
-        $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_cache;
-        $simpleCache->remove($namespacedTag);
-    }
-
-    /**
-     * @param string $tag
-     *
-     * @return array
-     */
-    private function namespaceTagRetrieve($tag)
-    {
-        $namespacedTag = $this->namespaceTag($tag);
-        $simpleCache   = $this->_cache;
-        $cacheEntry    = $simpleCache->retrieve($namespacedTag);
-
-        return $cacheEntry;
     }
 
     /**
@@ -328,55 +285,40 @@ class TaggedCache
     }
 
     /**
+     * This function returns true if the cache entry specified by $key exists; otherwise, it
+     * returns false.
+     *
      * @param string $key
      *
-     * @return string
+     * @return boolean
      */
-    private function namespaceKey($key)
-    {
-        return $this->_namespace . 'key:' . strval($key);
-    }
-
-    /**
-     * @param string $tag
-     *
-     * @return string
-     */
-    private function namespaceTag($tag)
-    {
-        return $this->_namespace . 'tag:' . strval($tag);
-    }
-
-    /**
-     * @param string $key
-     */
-    private function removeKeyFromTagCacheEntries($key)
+    public function exists($key)
     {
         $cacheEntry = $this->namespaceKeyRetrieve($key);
 
-        if($cacheEntry == null || isset($cacheEntry['tags']) == false)
+        if($cacheEntry == null)
         {
-            return;
+            return false;
         }
 
-        $tags = $cacheEntry['tags'];
+        $expired = $this->isCacheEntryExpired($cacheEntry);
 
-        if(is_array($tags) == false || count($tags) == 0)
+        if($expired == true)
         {
-            return;
+            $this->remove($key);
+
+            return false;
         }
 
-        foreach($tags as $tag)
-        {
-            $this->removeKeyFromSingleCacheTagEntry($tag, $key);
-        }
+        return true;
     }
 
     /**
+     * This function removes all cache entries that have been tagged with $tag.
+     *
      * @param string $tag
-     * @param string $key
      */
-    private function removeKeyFromSingleCacheTagEntry($tag, $key)
+    public function removeByTag($tag)
     {
         $keyList = $this->namespaceTagRetrieve($tag);
 
@@ -385,7 +327,41 @@ class TaggedCache
             return;
         }
 
-        $keyList = array_diff($keyList, array($key));
-        $this->namespaceKeyStore($tag, $keyList);
+        foreach($keyList as $key)
+        {
+            $this->remove($key);
+        }
+
+        $this->namespaceTagRemove($tag);
+    }
+
+    /**
+     * @param string $tag
+     */
+    private function namespaceTagRemove($tag)
+    {
+        $namespacedTag = $this->namespaceTag($tag);
+        $simpleCache   = $this->_cache;
+        $simpleCache->remove($namespacedTag);
+    }
+
+    /**
+     * This function removes all values from the cache.
+     */
+    public function removeAll()
+    {
+        $keyList = $this->namespaceTagRetrieve(self::ALL_KEYS_TAG);
+
+        if($keyList == null || is_array($keyList) == false || count($keyList) == 0)
+        {
+            return;
+        }
+
+        foreach($keyList as $key)
+        {
+            $this->remove($key);
+        }
+
+        $this->namespaceTagRemove(self::ALL_KEYS_TAG);
     }
 }

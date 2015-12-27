@@ -5,11 +5,6 @@ use JoeFallon\KissTest\UnitTest;
 use JoeFallon\PhpCache\ApcCache;
 use JoeFallon\PhpCache\TaggedCache;
 
-/**
- * @author    Joseph Fallon <joseph.t.fallon@gmail.com>
- * @copyright Copyright 2014 Joseph Fallon (All rights reserved)
- * @license   MIT
- */
 class TaggedCacheTests extends UnitTest
 {
     public function test_removeAll_for_no_cache_entries()
