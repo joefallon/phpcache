@@ -144,6 +144,6 @@ class TaggedCacheTests extends UnitTest
 
     public function setUp()
     {
-        apc_clear_cache('user');
+        apcu_clear_cache();
     }
 }
